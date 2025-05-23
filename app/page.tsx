@@ -2,7 +2,6 @@
 import StatCard from '@/components/StatCard'
 
 export default function DashboardPage() {
-  // Valores abiertos a cambios en un futuro
   const stats = [
     { label: 'Goles', value: 5 },
     { label: 'Asistencias', value: 3 },
