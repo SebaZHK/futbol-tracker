@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -19,40 +20,76 @@ export default function TournamentManager() {
   const [teamName, setTeamName] = useState('')
   const [tournament, setTournament] = useState<Tournament | null>(null)
 
+  const [teamA, setTeamA] = useState('')
+  const [teamB, setTeamB] = useState('')
+  const [goalsA, setGoalsA] = useState(0)
+  const [goalsB, setGoalsB] = useState(0)
+
   useEffect(() => {
     const stored = localStorage.getItem('tournament')
     if (stored) setTournament(JSON.parse(stored))
   }, [])
-
-  const addTeam = () => {
-    if (!tournament) return
-
-    const newTeam: Team = {
-      name: teamName,
-      points: 0,
-      goalsFor: 0,
-      goalsAgainst: 0,
-    }
-
-    const updated = {
-      ...tournament,
-      teams: [...tournament.teams, newTeam],
-    }
-
-    setTournament(updated)
-    localStorage.setItem('tournament', JSON.stringify(updated))
-    setTeamName('')
-  }
 
   const createTournament = () => {
     const newTournament: Tournament = {
       name: tournamentName,
       teams: [],
     }
-
     setTournament(newTournament)
     localStorage.setItem('tournament', JSON.stringify(newTournament))
     setTournamentName('')
+  }
+
+  const addTeam = () => {
+    if (!tournament || !teamName.trim()) return
+    const newTeam: Team = {
+      name: teamName.trim(),
+      points: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+    }
+    const updated = {
+      ...tournament,
+      teams: [...tournament.teams, newTeam],
+    }
+    setTournament(updated)
+    localStorage.setItem('tournament', JSON.stringify(updated))
+    setTeamName('')
+  }
+
+  const registerMatch = () => {
+    if (!tournament || teamA === teamB || !teamA || !teamB) return
+
+    const updatedTeams = tournament.teams.map((team) => {
+      const isA = team.name === teamA
+      const isB = team.name === teamB
+      if (!isA && !isB) return team
+
+      const goalsFor = isA ? goalsA : goalsB
+      const goalsAgainst = isA ? goalsB : goalsA
+      const won = goalsFor > goalsAgainst
+      const drawn = goalsFor === goalsAgainst
+
+      return {
+        ...team,
+        goalsFor: team.goalsFor + goalsFor,
+        goalsAgainst: team.goalsAgainst + goalsAgainst,
+        points: team.points + (won ? 3 : drawn ? 1 : 0),
+      }
+    })
+
+    const updated = {
+      ...tournament,
+      teams: updatedTeams,
+    }
+
+    setTournament(updated)
+    localStorage.setItem('tournament', JSON.stringify(updated))
+
+    setTeamA('')
+    setTeamB('')
+    setGoalsA(0)
+    setGoalsB(0)
   }
 
   return (
@@ -90,6 +127,48 @@ export default function TournamentManager() {
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               Agregar Equipo
+            </button>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow max-w-md mx-auto">
+            <h3 className="text-lg font-semibold mb-2">Registrar Partido</h3>
+            <div className="flex gap-2 mb-2">
+              <select value={teamA} onChange={(e) => setTeamA(e.target.value)} className="flex-1 border p-2 rounded">
+                <option value="">Equipo A</option>
+                {tournament.teams.map((t) => (
+                  <option key={t.name} value={t.name}>{t.name}</option>
+                ))}
+              </select>
+              <input
+                type="number"
+                value={goalsA}
+                onChange={(e) => setGoalsA(Number(e.target.value))}
+                className="w-16 text-center border rounded"
+                placeholder="G"
+              />
+            </div>
+
+            <div className="flex gap-2 mb-2">
+              <select value={teamB} onChange={(e) => setTeamB(e.target.value)} className="flex-1 border p-2 rounded">
+                <option value="">Equipo B</option>
+                {tournament.teams.map((t) => (
+                  <option key={t.name} value={t.name}>{t.name}</option>
+                ))}
+              </select>
+              <input
+                type="number"
+                value={goalsB}
+                onChange={(e) => setGoalsB(Number(e.target.value))}
+                className="w-16 text-center border rounded"
+                placeholder="G"
+              />
+            </div>
+
+            <button
+              onClick={registerMatch}
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full"
+            >
+              Registrar Resultado
             </button>
           </div>
 
