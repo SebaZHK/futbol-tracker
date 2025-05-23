@@ -4,8 +4,8 @@
 import { useState } from 'react'
 
 export default function PlayerProfile() {
-  const [name, setName] = useState('Sebastián')
-  const [position, setPosition] = useState('Delantero')
+  const [name, setName] = useState('Nombre')
+  const [position, setPosition] = useState('Posición')
   const [foot, setFoot] = useState('Derecha')
   const [speed, setSpeed] = useState(30)
 
