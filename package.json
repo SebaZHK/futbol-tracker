@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "clsx": "^2.1.1",
     "mi-futbol-tracker": "file:",
     "next": "15.3.2",
