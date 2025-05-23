@@ -113,22 +113,42 @@ export default function TournamentManager() {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="bg-white p-6 rounded-xl shadow max-w-md mx-auto">
-            <h2 className="text-xl font-bold mb-2">{tournament.name}</h2>
-            <input
-              type="text"
-              placeholder="Nombre del equipo"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              className="w-full p-2 border rounded mb-4"
-            />
-            <button
-              onClick={addTeam}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Agregar Equipo
-            </button>
-          </div>
+  <div className="bg-white p-6 rounded-xl shadow max-w-md mx-auto space-y-4">
+    <h2 className="text-xl font-bold">{tournament.name}</h2>
+
+    <div className="space-y-2">
+      <input
+        type="text"
+        placeholder="Nombre del equipo"
+        value={teamName}
+        onChange={(e) => setTeamName(e.target.value)}
+        className="w-full p-2 border rounded"
+      />
+      <button
+        onClick={addTeam}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
+      >
+        Agregar Equipo
+      </button>
+    </div>
+
+    <hr className="my-4" />
+
+    <div className="text-center">
+      <button
+        onClick={() => {
+          if (confirm('¿Seguro que quieres eliminar el torneo? Esta acción no se puede deshacer.')) {
+            localStorage.removeItem('tournament')
+            setTournament(null)
+          }
+        }}
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 w-full"
+      >
+        🗑 Eliminar Torneo
+      </button>
+    </div>
+  </div>
+
 
           <div className="bg-white p-6 rounded-xl shadow max-w-md mx-auto">
             <h3 className="text-lg font-semibold mb-2">Registrar Partido</h3>
@@ -177,7 +197,9 @@ export default function TournamentManager() {
             {tournament.teams.length === 0 ? (
               <p className="text-sm text-gray-500">Sin equipos aún.</p>
             ) : (
+                
               <table className="w-full text-sm text-left">
+                
                 <thead>
                   <tr className="text-gray-600">
                     <th>Equipo</th>
