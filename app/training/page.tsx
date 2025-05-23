@@ -1,8 +1,10 @@
+import TrainingForm from '@/components/TrainingForm'
+
 export default function TrainingPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Entrenamiento</h1>
-      <p>Gestiona tus rutinas y notas de entrenamiento.</p>
+      <h1 className="text-2xl font-bold mb-6">Entrenamiento</h1>
+      <TrainingForm />
     </div>
   )
 }
