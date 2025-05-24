@@ -1,3 +1,4 @@
+// components/MatchForm.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -24,7 +25,6 @@ export default function MatchForm() {
   const [minutes, setMinutes] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  // Función helper para obtener el ID del jugador
   const getPlayerId = async (userId: string) => {
     const { data: player, error } = await supabase
       .from('players')
@@ -35,7 +35,6 @@ export default function MatchForm() {
     return player.id
   }
 
-  // Cargar partidos desde Supabase
   useEffect(() => {
     const fetchMatches = async () => {
       const {
@@ -64,7 +63,6 @@ export default function MatchForm() {
     fetchMatches()
   }, [supabase])
 
-  // Guardar nuevo partido
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const {
@@ -91,7 +89,6 @@ export default function MatchForm() {
 
       if (error) throw error
       setMatches([data as Match, ...matches])
-      // reset form
       setDate('')
       setOpponent('')
       setType('')
@@ -112,57 +109,106 @@ export default function MatchForm() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow max-w-md mx-auto space-y-4">
-        <h2 className="text-xl font-bold mb-2">Registrar Partido</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-graphite-light p-6 rounded-xl shadow-md max-w-md mx-auto space-y-4"
+      >
+        <h2 className="text-xl font-semibold text-soft-blush">Registrar Partido</h2>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Fecha:
-          <input type="date" className="mt-1 w-full p-2 border rounded" value={date} onChange={(e) => setDate(e.target.value)} required />
+          <input
+            type="date"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            required
+          />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Rival:
-          <input type="text" className="mt-1 w-full p-2 border rounded" value={opponent} onChange={(e) => setOpponent(e.target.value)} required />
+          <input
+            type="text"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={opponent}
+            onChange={e => setOpponent(e.target.value)}
+            required
+          />
         </label>
 
-		<label className="block">
+        <label className="block text-soft-blush">
           Tipo de Partido:
-          <input type="text" className="mt-1 w-full p-2 border rounded" value={type} onChange={(e) => setType(e.target.value)} required />
+          <input
+            type="text"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={type}
+            onChange={e => setType(e.target.value)}
+            required
+          />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Goles:
-          <input type="number" className="mt-1 w-full p-2 border rounded" value={goals} onChange={(e) => setGoals(Number(e.target.value))} />
+          <input
+            type="number"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={goals}
+            onChange={e => setGoals(Number(e.target.value))}
+          />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Asistencias:
-          <input type="number" className="mt-1 w-full p-2 border rounded" value={assists} onChange={(e) => setAssists(Number(e.target.value))} />
+          <input
+            type="number"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={assists}
+            onChange={e => setAssists(Number(e.target.value))}
+          />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Minutos jugados:
-          <input type="number" className="mt-1 w-full p-2 border rounded" value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} />
+          <input
+            type="number"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
+            value={minutes}
+            onChange={e => setMinutes(Number(e.target.value))}
+          />
         </label>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="submit" className="btn-primary w-full">
           Guardar Partido
         </button>
       </form>
 
-      {/* Mostrar partidos */}
-      <div className="max-w-md mx-auto bg-white p-4 rounded-xl shadow">
-        <h3 className="text-lg font-semibold mb-2">Partidos Registrados</h3>
+      <div className="max-w-md mx-auto bg-graphite-light p-4 rounded-xl shadow-md">
+        <h3 className="text-lg font-semibold text-soft-blush mb-2">Partidos Registrados</h3>
         {loading ? (
-          <p>Cargando...</p>
+          <p className="text-soft-blush">Cargando...</p>
         ) : matches.length === 0 ? (
-          <p className="text-sm text-gray-500">Aún no has registrado ningún partido.</p>
+          <p className="text-sm text-soft-blush">Aún no has registrado ningún partido.</p>
         ) : (
-          <ul className="space-y-2 text-sm text-gray-700">
-            {matches.map((m) => (
-              <li key={m.id} className="border-b pb-2 flex justify-between items-center">
-                <span>{m.date} vs {m.opponent} — {m.type},{m.goals} goles, {m.assists} asistencias, {m.minutes} min</span>
-                <button onClick={() => handleDelete(m.id)} className="ml-2 text-red-500 hover:underline text-xs">Eliminar</button>
+          <ul className="space-y-2 text-soft-blush">
+            {matches.map(m => (
+              <li
+                key={m.id}
+                className="border-b border-graphite pb-2 flex justify-between items-center"
+              >
+                <span>
+                  <span className="font-medium">{m.date}</span> vs{' '}
+                  <span className="font-medium">{m.opponent}</span> — {m.type},{' '}
+                  <strong className="text-code-cyan">{m.goals} goles</strong>,{' '}
+                  <strong className="text-code-cyan">{m.assists} asistencias</strong>,{' '}
+                  <strong className="text-code-cyan">{m.minutes} min</strong>
+                </span>
+                <button
+                  onClick={() => handleDelete(m.id)}
+                  className="btn-secondary text-xs"
+                >
+                  Eliminar
+                </button>
               </li>
             ))}
           </ul>

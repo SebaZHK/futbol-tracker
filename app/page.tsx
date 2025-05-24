@@ -1,23 +1,22 @@
-// app/page.tsx
 'use client'
 
 import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-graphite p-6">
       {/* Hero Section */}
-      <div className="max-w-2xl">
-        <h1 className="text-5xl font-extrabold text-blue-900 mb-4">
+      <div className="max-w-2xl text-center">
+        <h1 className="text-5xl font-extrabold text-code-cyan mb-4">
           Mi Fútbol Tracker
         </h1>
-        <p className="text-lg text-gray-600 mb-8">
+        <p className="text-lg text-soft-blush mb-8">
           Tu compañera de equipo para estadísticas y entrenamientos
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/signup"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg text-lg font-medium hover:bg-blue-700"
+            className="btn-primary"
           >
             Comienza ahora
           </Link>
@@ -25,36 +24,20 @@ export default function HomePage() {
       </div>
 
       {/* Features Section */}
-      <div className="mt-16 bg-gray-50 w-full py-12">
+      <div className="mt-16 bg-night-black w-full py-12">
         <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="flex flex-col items-center px-4">
-            <span className="text-4xl">📊</span>
-            <h3 className="mt-4 text-xl font-semibold">Dashboard intuitivo</h3>
-            <p className="mt-2 text-gray-600 text-center">
-              Ve tus goles, asistencias y minutos de manera clara.
-            </p>
-          </div>
-          <div className="flex flex-col items-center px-4">
-            <span className="text-4xl">⚽</span>
-            <h3 className="mt-4 text-xl font-semibold">Registro inmediato</h3>
-            <p className="mt-2 text-gray-600 text-center">
-              Añade partidos y entrenos al instante.
-            </p>
-          </div>
-          <div className="flex flex-col items-center px-4">
-            <span className="text-4xl">🏃</span>
-            <h3 className="mt-4 text-xl font-semibold">Plan de entrenamiento</h3>
-            <p className="mt-2 text-gray-600 text-center">
-              Lleva un seguimiento de tus rutinas.
-            </p>
-          </div>
-          <div className="flex flex-col items-center px-4">
-            <span className="text-4xl">🏆</span>
-            <h3 className="mt-4 text-xl font-semibold">Torneos y rankings</h3>
-            <p className="mt-2 text-gray-600 text-center">
-              Organiza y compite con tu equipo.
-            </p>
-          </div>
+          {[
+            { icon: '📊', title: 'Dashboard intuitivo', desc: 'Ve tus goles, asistencias y minutos de manera clara.' },
+            { icon: '⚽', title: 'Registro inmediato', desc: 'Añade partidos y entrenos al instante.' },
+            { icon: '🏃', title: 'Plan de entrenamiento', desc: 'Lleva un seguimiento de tus rutinas.' },
+            { icon: '🏆', title: 'Torneos y rankings', desc: 'Organiza y compite con tu equipo.' },
+          ].map(({ icon, title, desc }) => (
+            <div key={title} className="flex flex-col items-center px-4">
+              <span className="text-4xl text-code-cyan">{icon}</span>
+              <h3 className="mt-4 text-xl font-semibold text-soft-blush">{title}</h3>
+              <p className="mt-2 text-soft-blush text-center">{desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

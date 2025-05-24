@@ -1,9 +1,10 @@
+// app/tournaments/page.tsx
 import TournamentManager from '@/components/TournamentManager'
 
 export default function TournamentsPage() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Torneos</h1>
+    <div className="space-y-6 py-8">
+      <h1 className="text-3xl font-bold text-code-cyan text-center">Torneos</h1>
       <TournamentManager />
     </div>
   )

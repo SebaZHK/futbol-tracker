@@ -9,8 +9,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        'night-black': '#0D1117',
+        'graphite': '#161B22',
+        'graphite-light': '#24292e',
+        'code-cyan': '#3EE4D9',
+        'soft-blush': '#F6E8EA',
+        'soft-blush-dark': '#D1C7C5',
+        'alert-rose': '#EF626C',
+      },
+      fontFamily: {
+        sans: ['Inter', 'Arial', 'Helvetica', 'sans-serif'],
       },
     },
   },

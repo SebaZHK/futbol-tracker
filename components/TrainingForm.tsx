@@ -1,3 +1,4 @@
+// components/TrainingForm.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -13,7 +14,6 @@ type Training = {
 
 export default function TrainingForm() {
   const supabase = createClientComponentClient()
-
   const [trainings, setTrainings] = useState<Training[]>([])
   const [date, setDate] = useState('')
   const [type, setType] = useState('')
@@ -21,7 +21,6 @@ export default function TrainingForm() {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Helper: devuelve el player_id asociado al user_id
   const getPlayerId = async (userId: string) => {
     const { data: player, error } = await supabase
       .from('players')
@@ -32,7 +31,6 @@ export default function TrainingForm() {
     return player.id
   }
 
-  // Cargar entrenamientos desde Supabase
   useEffect(() => {
     const fetchTrainings = async () => {
       const {
@@ -61,7 +59,6 @@ export default function TrainingForm() {
     fetchTrainings()
   }, [supabase])
 
-  // Guardar nuevo entrenamiento
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const {
@@ -86,7 +83,6 @@ export default function TrainingForm() {
 
       if (error) throw error
       setTrainings([data as Training, ...trainings])
-      // reset
       setDate('')
       setType('')
       setDuration(0)
@@ -98,68 +94,74 @@ export default function TrainingForm() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow max-w-md mx-auto space-y-4">
-        <h2 className="text-xl font-bold mb-2">Registrar Entrenamiento</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-graphite-light p-6 rounded-xl shadow-md max-w-md mx-auto space-y-4"
+      >
+        <h2 className="text-xl font-semibold text-code-cyan">Registrar Entrenamiento</h2>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Fecha:
           <input
             type="date"
-            className="mt-1 w-full p-2 border rounded"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={e => setDate(e.target.value)}
             required
           />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Tipo de entrenamiento:
           <input
             type="text"
-            className="mt-1 w-full p-2 border rounded"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={e => setType(e.target.value)}
             placeholder="Ej: cardio, técnica, táctica"
           />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Duración (minutos):
           <input
             type="number"
-            className="mt-1 w-full p-2 border rounded"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
             value={duration}
-            onChange={(e) => setDuration(Number(e.target.value))}
+            onChange={e => setDuration(Number(e.target.value))}
           />
         </label>
 
-        <label className="block">
+        <label className="block text-soft-blush">
           Notas:
           <textarea
-            className="mt-1 w-full p-2 border rounded"
+            className="mt-1 w-full p-2 bg-night-black text-soft-blush border border-graphite rounded"
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            onChange={e => setNotes(e.target.value)}
           />
         </label>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="submit" className="btn-primary w-full">
           Guardar Entrenamiento
         </button>
       </form>
 
-      <div className="max-w-md mx-auto bg-white p-4 rounded-xl shadow">
-        <h3 className="text-lg font-semibold mb-2">Entrenamientos Registrados</h3>
+      <div className="max-w-md mx-auto bg-graphite-light p-4 rounded-xl shadow-md">
+        <h3 className="text-lg font-semibold text-soft-blush mb-2">
+          Entrenamientos Registrados
+        </h3>
         {loading ? (
-          <p>Cargando...</p>
+          <p className="text-soft-blush">Cargando...</p>
         ) : trainings.length === 0 ? (
-          <p className="text-sm text-gray-500">No hay sesiones aún.</p>
+          <p className="text-sm text-soft-blush">No hay sesiones aún.</p>
         ) : (
-          <ul className="space-y-2 text-sm text-gray-700">
-            {trainings.map((t) => (
-              <li key={t.id} className="border-b pb-2">
-                {t.date} — {t.type}, {t.duration} min
+          <ul className="space-y-2 text-soft-blush">
+            {trainings.map(t => (
+              <li key={t.id} className="border-b border-graphite pb-2">
+                <span className="font-medium">{t.date}</span> — {t.type},{' '}
+                {t.duration} min
                 <br />
-                <span className="text-xs text-gray-500">Notas: {t.notes}</span>
+                <span className="text-xs text-soft-blush-dark">Notas: {t.notes}</span>
               </li>
             ))}
           </ul>
