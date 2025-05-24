@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 type Training = {
   id: string
@@ -11,37 +12,88 @@ type Training = {
 }
 
 export default function TrainingForm() {
+  const supabase = createClientComponentClient()
+
   const [trainings, setTrainings] = useState<Training[]>([])
   const [date, setDate] = useState('')
   const [type, setType] = useState('')
   const [duration, setDuration] = useState(0)
   const [notes, setNotes] = useState('')
+  const [loading, setLoading] = useState(true)
 
+  // Helper: devuelve el player_id asociado al user_id
+  const getPlayerId = async (userId: string) => {
+    const { data: player, error } = await supabase
+      .from('players')
+      .select('id')
+      .eq('user_id', userId)
+      .single()
+    if (error || !player) throw new Error('Player not found')
+    return player.id
+  }
+
+  // Cargar entrenamientos desde Supabase
   useEffect(() => {
-    const stored = localStorage.getItem('trainings')
-    if (stored) setTrainings(JSON.parse(stored))
-  }, [])
+    const fetchTrainings = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      const userId = session?.user.id
+      if (!userId) return
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+      try {
+        const playerId = await getPlayerId(userId)
+        const { data, error } = await supabase
+          .from('trainings')
+          .select('*')
+          .eq('player_id', playerId)
+          .order('date', { ascending: false })
 
-    const newTraining: Training = {
-      id: crypto.randomUUID(),
-      date,
-      type,
-      duration,
-      notes,
+        if (error) throw error
+        setTrainings(data)
+      } catch (err: any) {
+        console.error('Error fetching trainings:', err.message)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const updatedTrainings = [newTraining, ...trainings]
-    setTrainings(updatedTrainings)
-    localStorage.setItem('trainings', JSON.stringify(updatedTrainings))
+    fetchTrainings()
+  }, [supabase])
 
-    // Reset
-    setDate('')
-    setType('')
-    setDuration(0)
-    setNotes('')
+  // Guardar nuevo entrenamiento
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    const userId = session?.user.id
+    if (!userId) return
+
+    try {
+      const playerId = await getPlayerId(userId)
+      const { data, error } = await supabase
+        .from('trainings')
+        .insert({
+          date,
+          type,
+          duration,
+          notes,
+          player_id: playerId,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      setTrainings([data as Training, ...trainings])
+      // reset
+      setDate('')
+      setType('')
+      setDuration(0)
+      setNotes('')
+    } catch (err: any) {
+      console.error('Error adding training:', err.message)
+    }
   }
 
   return (
@@ -97,7 +149,9 @@ export default function TrainingForm() {
 
       <div className="max-w-md mx-auto bg-white p-4 rounded-xl shadow">
         <h3 className="text-lg font-semibold mb-2">Entrenamientos Registrados</h3>
-        {trainings.length === 0 ? (
+        {loading ? (
+          <p>Cargando...</p>
+        ) : trainings.length === 0 ? (
           <p className="text-sm text-gray-500">No hay sesiones aún.</p>
         ) : (
           <ul className="space-y-2 text-sm text-gray-700">
