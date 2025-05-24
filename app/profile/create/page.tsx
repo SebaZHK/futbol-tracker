@@ -3,14 +3,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import LogoutButton from '@/components/LogoutButton'
 
 export default function CreatePlayerProfile() {
   const router = useRouter()
+  const supabase = createClientComponentClient()
+
   const [name, setName] = useState('')
   const [position, setPosition] = useState('')
   const [foot, setFoot] = useState('Derecha')
-  const [speed, setSpeed] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -20,81 +22,93 @@ export default function CreatePlayerProfile() {
     setError(null)
 
     const {
-      data: { user },
+      data: { session },
       error: sessionError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getSession()
 
-    if (sessionError || !user) {
-      setError('No se pudo obtener el usuario actual.')
+    if (sessionError || !session) {
+      setError('No se pudo obtener la sesión actual.')
       setLoading(false)
       return
     }
 
-    const { error: insertError } = await supabase.from('players').insert({
-      name,
-      position,
-      preferred_foot: foot,
-      max_speed: speed,
-      user_id: user.id,
-    })
+    const userId = session.user.id
+    const { error: insertError } = await supabase
+      .from('players')
+      .insert({
+        name,
+        position,
+        preferred_foot: foot,
+        user_id: userId,
+      })
 
-    if (insertError) setError(insertError.message)
-    else router.push('/dashboard')
+    if (insertError) {
+      setError(insertError.message)
+    } else {
+      router.push('/dashboard')
+    }
 
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Crear perfil de jugador</h1>
+    <div className="min-h-screen flex items-center justify-center bg-graphite p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-graphite-light p-8 rounded-xl shadow-md w-full max-w-md space-y-4"
+      >
+        <h1 className="text-2xl font-bold text-code-cyan text-center">
+          Crear perfil de jugador
+        </h1>
 
-        <label className="block mb-2">Nombre</label>
-        <input
-          type="text"
-          className="w-full border p-2 mb-4 rounded"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <label className="block text-soft-blush">
+          Nombre
+          <input
+            type="text"
+            className="w-full bg-night-black text-soft-blush border border-graphite p-2 rounded mt-1"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+          />
+        </label>
 
-        <label className="block mb-2">Posición</label>
-        <input
-          type="text"
-          className="w-full border p-2 mb-4 rounded"
-          value={position}
-          onChange={(e) => setPosition(e.target.value)}
-          required
-        />
+        <label className="block text-soft-blush">
+          Posición
+          <input
+            type="text"
+            className="w-full bg-night-black text-soft-blush border border-graphite p-2 rounded mt-1"
+            value={position}
+            onChange={e => setPosition(e.target.value)}
+            required
+          />
+        </label>
 
-        <label className="block mb-2">Pierna hábil</label>
-        <select
-          className="w-full border p-2 mb-4 rounded"
-          value={foot}
-          onChange={(e) => setFoot(e.target.value)}
-        >
-          <option>Derecha</option>
-          <option>Izquierda</option>
-          <option>Ambas</option>
-        </select>
+        <label className="block text-soft-blush">
+          Pierna hábil
+          <select
+            className="w-full bg-night-black text-soft-blush border border-graphite p-2 rounded mt-1"
+            value={foot}
+            onChange={e => setFoot(e.target.value)}
+          >
+            <option>Derecha</option>
+            <option>Izquierda</option>
+            <option>Ambas</option>
+          </select>
+        </label>
 
-        <label className="block mb-2">Velocidad máxima (km/h)</label>
-        <input
-          type="number"
-          className="w-full border p-2 mb-4 rounded"
-          value={speed}
-          onChange={(e) => setSpeed(Number(e.target.value))}
-        />
-
-        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+        {error && <p className="text-alert-rose text-sm">{error}</p>}
 
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
+          className="btn-primary w-full"
           disabled={loading}
         >
           {loading ? 'Guardando...' : 'Crear perfil'}
         </button>
+
+        <div className="text-center">
+          <LogoutButton />
+        </div>
       </form>
     </div>
   )

@@ -1,3 +1,4 @@
+// components/Navbar.tsx
 'use client'
 
 import Link from 'next/link'
@@ -7,18 +8,45 @@ import LogoutButton from '@/components/LogoutButton'
 
 export default function Navbar() {
   const [sessionExists, setSessionExists] = useState<boolean>(false)
+  const [hasPlayer, setHasPlayer] = useState<boolean>(false)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSessionExists(!!session)
-    })
+    let listener: any
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      const loggedIn = !!session
+      setSessionExists(loggedIn)
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSessionExists(!!session)
+      if (loggedIn) {
+        const { data: player, error } = await supabase
+          .from('players')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .single()
+        setHasPlayer(!!player && !error)
+      } else {
+        setHasPlayer(false)
       }
-    )
+    }
+
+    checkSession()
+    listener = supabase.auth.onAuthStateChange((_, session) => {
+      if (session) {
+        setSessionExists(true)
+        supabase
+          .from('players')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .single()
+          .then(({ data, error }) => {
+            setHasPlayer(!!data && !error)
+          })
+      } else {
+        setSessionExists(false)
+        setHasPlayer(false)
+      }
+    })
 
     return () => listener.subscription.unsubscribe()
   }, [supabase])
@@ -29,40 +57,38 @@ export default function Navbar() {
         <Link href="/">
           <span className="text-2xl font-bold text-code-cyan">Fútbol Tracker</span>
         </Link>
-        <ul className="flex items-center gap-6">
-          {sessionExists ? (
-            [
-              { href: '/dashboard', label: 'Dashboard' },
-              { href: '/profile', label: 'Perfil' },
-              { href: '/matches', label: 'Partidos' },
-              { href: '/training', label: 'Entrenamientos' },
-              { href: '/tournaments', label: 'Torneos' },
-            ].map(({ href, label }) => (
-              <li key={href}>
-                <Link href={href} className="link-secondary">
-                  {label}
-                </Link>
-              </li>
-            ))
-          ) : (
-            [
-              { href: '/', label: 'Home' },
-              { href: '/login', label: 'Iniciar sesión' },
-              { href: '/signup', label: 'Registrarse' },
-            ].map(({ href, label }) => (
-              <li key={href}>
-                <Link href={href} className="link-secondary">
-                  {label}
-                </Link>
-              </li>
-            ))
-          )}
-          {sessionExists && (
-            <li>
-              <LogoutButton />
-            </li>
-          )}
-        </ul>
+        {(!sessionExists || (sessionExists && hasPlayer)) && (
+          <ul className="flex items-center gap-6">
+            {sessionExists ? (
+              [
+                { href: '/dashboard', label: 'Dashboard' },
+                { href: '/profile', label: 'Perfil' },
+                { href: '/matches', label: 'Partidos' },
+                { href: '/training', label: 'Entrenamientos' },
+                { href: '/tournaments', label: 'Torneos' },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="link-secondary">
+                    {label}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              [
+                { href: '/', label: 'Home' },
+                { href: '/login', label: 'Iniciar sesión' },
+                { href: '/signup', label: 'Registrarse' },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="link-secondary">
+                    {label}
+                  </Link>
+                </li>
+              ))
+            )}
+            {sessionExists && hasPlayer && <LogoutButton />}
+          </ul>
+        )}
       </div>
     </nav>
   )
