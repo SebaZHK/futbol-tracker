@@ -66,12 +66,21 @@ export default function DashboardPage() {
   const totalAssists = matches.reduce((sum, m) => sum + m.assists, 0)
   const totalMatches = matches.length
   const totalMinutes = matches.reduce((sum, m) => sum + m.minutes, 0)
+  const avgGoals = totalMatches > 0
+    ? Number((totalGoals / totalMatches).toFixed(2))
+    : 0
+  const avgAssits = totalMatches > 0
+    ? Number((totalAssists / totalMatches).toFixed(2))
+    : 0
 
   const stats = [
     { label: 'Goles', value: totalGoals },
     { label: 'Asistencias', value: totalAssists },
     { label: 'Partidos', value: totalMatches },
     { label: 'Minutos', value: totalMinutes },
+    { label: 'Promedio de gol por partido', value: avgGoals},
+    { label: 'Promedio de asistencias por partido', value: avgAssits},
+
   ]
 
   return (
