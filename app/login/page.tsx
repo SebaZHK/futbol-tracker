@@ -31,7 +31,7 @@ export default function LoginPage() {
     if (error) {
       setError(error)
     } else {
-      router.push('/')
+      router.push('/dashboard')
     }
   }
 
