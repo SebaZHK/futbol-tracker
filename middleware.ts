@@ -1,21 +1,24 @@
-// middleware.ts
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  const supabaseToken = request.cookies.get('sb-access-token')?.value
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
 
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') ||
-                           request.nextUrl.pathname.startsWith('/matches') ||
-                           request.nextUrl.pathname.startsWith('/training') ||
-                           request.nextUrl.pathname.startsWith('/tournaments') ||
-                           request.nextUrl.pathname.startsWith('/profile') ||
-                           request.nextUrl.pathname.startsWith('/stats')
+  const supabase = createMiddlewareClient({ req, res })
 
-  if (isProtectedRoute && !supabaseToken) {
-    const loginUrl = new URL('/signup', request.url)
-    return NextResponse.redirect(loginUrl)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // Si no hay sesión, redirige al login
+  if (!session) {
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  return NextResponse.next()
+  return res
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*'], // protege cualquier ruta bajo /dashboard
 }
