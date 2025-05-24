@@ -23,7 +23,7 @@ export default function SignupPage() {
     })
 
     if (error) setError(error.message)
-    else router.push('/')
+    else router.push('/profile/create')
 
     setLoading(false)
   }
