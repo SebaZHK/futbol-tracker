@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import LogoutButton from '@/components/LogoutButton'
 
 export default function Navbar() {
   const [sessionExists, setSessionExists] = useState<boolean>(false)
@@ -55,6 +56,11 @@ export default function Navbar() {
                 </Link>
               </li>
             ))
+          )}
+          {sessionExists && (
+            <li>
+              <LogoutButton />
+            </li>
           )}
         </ul>
       </div>
