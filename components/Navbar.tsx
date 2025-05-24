@@ -10,19 +10,16 @@ export default function Navbar() {
   const supabase = createClientComponentClient()
 
   useEffect(() => {
-    // 1. Al montar, pedimos el estado inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSessionExists(!!session)
     })
 
-    // 2. Nos suscribimos a cambios futuros (login, logout)
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSessionExists(!!session)
       }
     )
 
-    // 3. Limpiamos al desmontar
     return () => {
       listener.subscription.unsubscribe()
     }
@@ -31,7 +28,6 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow p-4">
       <ul className="flex gap-4">
-        <li><Link href="/">Home</Link></li>
         {sessionExists ? (
           <>
             <li><Link href="/dashboard">Dashboard</Link></li>
@@ -42,6 +38,7 @@ export default function Navbar() {
           </>
         ) : (
           <>
+            <li><Link href="/">Home</Link></li>
             <li><Link href="/login">Iniciar sesión</Link></li>
             <li><Link href="/signup">Registrarse</Link></li>
           </>
