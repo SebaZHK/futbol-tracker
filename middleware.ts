@@ -20,5 +20,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'], // protege cualquier ruta bajo /dashboard
+  matcher: [
+    '/dashboard/:path*',
+    '/profile/:path*',
+    '/stats/:path*',
+    '/training/:path*',
+    '/matches/:path*',
+    '/tournaments/:path*',
+  ],
 }
