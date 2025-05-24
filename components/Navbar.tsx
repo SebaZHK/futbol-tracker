@@ -2,37 +2,50 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import clsx from 'clsx'
-
-const links = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/profile', label: 'Perfil' },
-  { href: '/matches', label: 'Partidos' },
-  { href: '/stats', label: 'Estadísticas' },
-  { href: '/training', label: 'Entrenamiento' },
-  { href: '/tournaments', label: 'Torneos' },
-]
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Navbar() {
-  const pathname = usePathname()
+  const [sessionExists, setSessionExists] = useState<boolean>(false)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    // 1. Al montar, pedimos el estado inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSessionExists(!!session)
+    })
+
+    // 2. Nos suscribimos a cambios futuros (login, logout)
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSessionExists(!!session)
+      }
+    )
+
+    // 3. Limpiamos al desmontar
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+  }, [supabase])
 
   return (
-    <nav className="bg-white shadow p-4 mb-6">
+    <nav className="bg-white shadow p-4">
       <ul className="flex gap-4">
-        {links.map(({ href, label }) => (
-          <li key={href}>
-            <Link
-              href={href}
-              className={clsx(
-                'text-sm font-medium',
-                pathname === href ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-              )}
-            >
-              {label}
-            </Link>
-          </li>
-        ))}
+        <li><Link href="/">Home</Link></li>
+        {sessionExists ? (
+          <>
+            <li><Link href="/dashboard">Dashboard</Link></li>
+            <li><Link href="/profile">Perfil</Link></li>
+            <li><Link href="/matches">Partidos</Link></li>
+            <li><Link href="/training">Entrenamientos</Link></li>
+            <li><Link href="/tournaments">Torneos</Link></li>
+          </>
+        ) : (
+          <>
+            <li><Link href="/login">Iniciar sesión</Link></li>
+            <li><Link href="/signup">Registrarse</Link></li>
+          </>
+        )}
       </ul>
     </nav>
   )
